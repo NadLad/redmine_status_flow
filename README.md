@@ -1,32 +1,36 @@
-# Redmine Status History
+# Redmine Status Flow
 
-[![Tests](https://github.com/redmineservices/redmine_status_history/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/redmineservices/redmine_status_history/actions/workflows/test.yml)
-[![Release](https://img.shields.io/github/v/release/redmineservices/redmine_status_history)](https://github.com/redmineservices/redmine_status_history/releases/latest)
-![Redmine](https://img.shields.io/badge/Redmine-5.x%20%7C%206.x-B32024)
-![Ruby](https://img.shields.io/badge/Ruby-3.1--3.3-CC342D?logo=ruby&logoColor=white)
-[![License](https://img.shields.io/github/license/redmineservices/redmine_status_history)](LICENSE)
+[![Tests](https://github.com/NadLad/redmine_status_flow/actions/workflows/test.yml/badge.svg?branch=redmine-7)](https://github.com/NadLad/redmine_status_flow/actions/workflows/test.yml)
+![Redmine](https://img.shields.io/badge/Redmine-5.x%20%7C%206.x%20%7C%207.x-B32024)
+![Ruby](https://img.shields.io/badge/Ruby-3.1--4.0-CC342D?logo=ruby&logoColor=white)
+[![License](https://img.shields.io/github/license/NadLad/redmine_status_flow)](LICENSE)
 
-`redmine_status_history` records every issue status interval and provides a
-project-level search for transitions between statuses and dates. It also adds
-the last status-change date as an issue query filter and column.
+`redmine_status_flow` records every issue status interval, exposes the status
+timeline on the issue page, and adds status-transition filters and columns to
+the standard issue query builder.
+
+It is a fork of
+[`redmineservices/redmine_status_history`](https://github.com/redmineservices/redmine_status_history)
+(2.0.0) with Redmine 7.0 support, hardened callbacks and a batched backfill.
 
 ## Features
 
+- Status timeline rendered inline on the issue page (no modal, no XHR).
 - Search status transitions within a project and date range.
 - Optionally filter by both the previous and destination statuses.
-- View the complete status timeline for an issue.
 - Filter and sort issue queries by the last status-change date.
 - Restrict access with a project permission.
 
 ## Compatibility
 
-| Plugin | Redmine | Rails |
-| --- | --- | --- |
-| 2.0.x | 5.0.x, 5.1.x | 6.1 |
-| 2.0.x | 6.0.x, 6.1.x | 7.2 |
+| Plugin | Redmine | Ruby | Rails |
+| --- | --- | --- | --- |
+| 2.0.x | 5.0.x, 5.1.x, 6.0.x, 6.1.x | 3.1 - 3.3 | 6.1 - 7.2 |
+| 3.0.x | 5.0.x - 7.0.x | 3.1 - 4.0 | 6.1 - 8.1 |
 
-The CI matrix covers Redmine 5.0.14, 5.1.13, 6.0.10 and 6.1.3. Redmine 5.x
-is supported by this plugin even though it is no longer maintained upstream.
+Redmine 7.0.2 (Ruby 4.0.8, Rails 8.1.4) is covered by CI. `requires_redmine`
+has no upper bound in Redmine's plugin API, so a Redmine major above 7 logs a
+warning at boot instead of failing silently.
 
 ## Installation
 
@@ -34,35 +38,60 @@ From the Redmine directory:
 
 ```sh
 cd plugins
-git clone https://github.com/redmineservices/redmine_status_history.git
+git clone https://github.com/NadLad/redmine_status_flow.git
 cd ..
-bundle exec rake redmine:plugins:migrate NAME=redmine_status_history RAILS_ENV=production
+bundle exec rake redmine:plugins:migrate NAME=redmine_status_flow RAILS_ENV=production
 ```
 
 Restart Redmine and grant **Search issue status history** to the appropriate
-project roles. The first migration reconstructs existing status history and
-can take time on installations with many issues.
+project roles.
 
-## Upgrade from 1.x
+The backfill of existing issues is **not** part of the migration anymore: run
+`bundle exec rake redmine_status_flow:rebuild` once, after the migration, in
+batches. On large installations this avoids the multi-hour migration and its
+long table lock.
 
-Back up the database, replace the plugin files and run the migration command
-shown above. Restart Redmine after the migration.
+## Plugin identity
+
+The plugin id is `redmine_status_flow`, derived from the symbol passed to
+`Redmine::Plugin.register` — not from the directory name. Migration state lives
+in the shared `schema_migrations` table under `<version>-<plugin_id>`.
+
+The Ruby namespace stays `RedmineStatusHistory` and the model stays
+`IssueStatusHistory`: they are code identifiers, not plugin identity, and
+renaming them would break every existing reference for no functional gain.
+
+## Upgrade from `redmine_status_history`
+
+Back up the database first, then:
+
+```sh
+cd plugins
+mv redmine_status_history redmine_status_flow
+cd ..
+bundle exec rake redmine_status_flow:adopt_legacy_identity RAILS_ENV=production
+bundle exec rake redmine:plugins:migrate NAME=redmine_status_flow RAILS_ENV=production
+```
+
+`adopt_legacy_identity` rewrites the migration rows recorded under the legacy
+id so Redmine does not replay them. It is idempotent and reports `nothing to
+adopt` on a fresh install.
 
 ## Usage
 
 Open a project's issue list and select **Search issue changes**. Choose the
 destination status, optional previous status and date range. The result list
-links to the complete status timeline for each matching issue.
+links to each matching issue.
 
-The standard issue query builder also exposes **Last status change** as a date
-filter and sortable column.
+The issue page shows the status timeline inline, and the standard issue query
+builder exposes **Last status change** as a date filter and sortable column.
 
 ## Uninstallation
 
 Back up the database, then run:
 
 ```sh
-bundle exec rake redmine:plugins:migrate NAME=redmine_status_history VERSION=0 RAILS_ENV=production
+bundle exec rake redmine:plugins:migrate NAME=redmine_status_flow VERSION=0 RAILS_ENV=production
 ```
 
 Remove the plugin directory and restart Redmine.
@@ -74,5 +103,5 @@ to [SECURITY.md](SECURITY.md).
 
 ## License
 
-This project is licensed under the GNU General Public License v2.0 or later.
-See [LICENSE](LICENSE).
+This project is licensed under the GNU General Public License v2.0 or later,
+inherited from the upstream project. See [LICENSE](LICENSE).

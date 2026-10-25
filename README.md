@@ -28,9 +28,9 @@ It is a fork of
 | 2.0.x | 5.0.x, 5.1.x, 6.0.x, 6.1.x | 3.1 - 3.3 | 6.1 - 7.2 |
 | 3.0.x | 5.0.x - 7.0.x | 3.1 - 4.0 | 6.1 - 8.1 |
 
-Redmine 7.0.2 (Ruby 4.0.8, Rails 8.1.4) is covered by CI. `requires_redmine`
-has no upper bound in Redmine's plugin API, so a Redmine major above 7 logs a
-warning at boot instead of failing silently.
+Redmine 7.0.2 (Ruby 4.0.8, Rails 8.1.4) is covered by CI. The plugin declares
+`requires_redmine version: '5.0'..'7.0'`, so a Redmine major above 7 is refused
+at boot instead of loading unverified code.
 
 ## Installation
 

@@ -26,16 +26,9 @@ Redmine::Plugin.register :redmine_status_flow do
   version '3.0.0'
   url 'https://github.com/NadLad/redmine_status_flow'
   author_url 'https://github.com/NadLad'
-  requires_redmine version_or_higher: '5.0.0'
-
-  # requires_redmine has no upper bound in Redmine's plugin API, so the tested
-  # ceiling is enforced here instead of silently claiming support for 8.x.
-  if Redmine::VERSION::MAJOR > 7
-    Rails.logger.warn(
-      "redmine_status_flow #{version}: not validated on Redmine #{Redmine::VERSION}, " \
-      'the tested range is 5.0 - 7.0.x'
-    )
-  end
+  # requires_redmine accepts a Range, which gives the fork a real upper bound:
+  # Redmine above 7.0 is refused at boot instead of loading unverified code.
+  requires_redmine version: '5.0'..'7.0'
 
   project_module :issue_tracking do
     permission :search_status_history,

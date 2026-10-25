@@ -22,6 +22,11 @@ en:
   label_status_flow_created: Created
   label_status_flow_changed: Changed
   label_status_flow_under_minute: "< 1min"
+  label_status_flow_changed_to: Status changed to
+  label_status_flow_changed_from: Status changed from
+  label_status_flow_changed_between: Status changed on
+  label_status_flow_time_in_current_status: Days in current status
+  label_status_flow_reopen_count: Reopen count
   label_status_flow_duration_days: "%{days}d %{hours}h"
   label_status_flow_duration_hours: "%{hours}h %{minutes}min"
   label_status_flow_duration_minutes: "%{minutes}min"

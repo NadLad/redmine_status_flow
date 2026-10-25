@@ -19,7 +19,27 @@ It is a fork of
 - Search status transitions within a project and date range.
 - Optionally filter by both the previous and destination statuses.
 - Filter and sort issue queries by the last status-change date.
+- Native query filters: `Status changed to`, `Status changed from`,
+  `Status changed on`, `Days in current status` and `Reopen count`.
 - Restrict access with a project permission.
+
+## Query filters
+
+All five filters are registered through the standard issue query builder, so
+they work wherever a query runs: the issues list, saved queries and the CSV
+export (`/issues.csv`).
+
+| Filter | Type | Meaning |
+| --- | --- | --- |
+| Status changed to | list | the issue has an interval whose status is one of the selected ones |
+| Status changed from | list | the issue has an interval whose previous status is one of the selected ones |
+| Status changed on | date | the change happened within the range |
+| Days in current status | integer | age, in days, of the interval still open |
+| Reopen count | integer | number of transitions from a closed status to an open one |
+| Last status change | date | date of the latest interval |
+
+The SQL uses `EXISTS`/`COUNT` subqueries rather than joins: joining the history
+table multiplies issue rows, one per interval, which breaks pagination counts.
 
 ## Compatibility
 

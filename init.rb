@@ -19,6 +19,19 @@ require 'redmine_status_history/patches/journal_detail_patch'
   target.include(patch) unless target.ancestors.include?(patch.const_get(:InstanceMethods))
 end
 
+# Columns are registered on the class, not on an instance: IssueQuery#available_columns
+# memoizes a dup of the class array, so mutating an instance's array only lasted
+# for that one query. class_attribute shares the array with Query, hence the dup
+# before appending -- otherwise the column would leak into every query class.
+unless IssueQuery.available_columns.any? { |column| column.name == :last_status_update }
+  IssueQuery.available_columns = IssueQuery.available_columns.dup
+  IssueQuery.add_available_column(
+    QueryColumn.new(:last_status_update,
+                    sortable: "#{Issue.table_name}.last_status_update",
+                    caption: :field_last_status_update)
+  )
+end
+
 require 'redmine_status_history/hooks/view_issues_index_bottom'
 require 'redmine_status_history/hooks/view_issues_show_details_bottom'
 require 'redmine_status_history/hooks/view_layouts_base_html_head'

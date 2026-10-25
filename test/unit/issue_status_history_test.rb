@@ -72,6 +72,9 @@ class IssueStatusHistoryTest < ActiveSupport::TestCase
 
     assert query.available_filters.key?('last_status_update')
     assert_equal 1, query.available_filters.keys.count('last_status_update')
+    # The column is registered on the class (Query.add_available_column) and
+    # memoized per instance, so asking twice must not duplicate it either.
+    assert_equal 1, query.available_columns.count { |column| column.name == :last_status_update }
     assert_equal 1, query.available_columns.count { |column| column.name == :last_status_update }
   end
 end

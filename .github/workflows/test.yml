@@ -2,7 +2,7 @@ name: Test
 
 on:
   push:
-    branches: [main]
+    branches: [main, redmine-7]
   pull_request:
 
 permissions:
@@ -13,16 +13,29 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # The Ruby versions are the ones each Redmine branch itself tests
+      # against (see redmine/redmine .github/workflows/tests.yml): 5.1 runs
+      # 3.0-3.2, 6.1 runs 3.2-3.4, 7.0 runs 3.2-4.0. Only the oldest and
+      # newest of each branch are exercised, except on 7.0 which gets the
+      # full set: a plugin that breaks on 4.0 is the case worth catching.
       matrix:
         include:
-          - redmine: 5.0.14
-            ruby: '3.1'
-          - redmine: 5.1.13
+          - redmine: '5.1.13'
+            ruby: '3.0'
+          - redmine: '5.1.13'
             ruby: '3.2'
-          - redmine: 6.0.10
+          - redmine: '6.1.5'
+            ruby: '3.2'
+          - redmine: '6.1.5'
+            ruby: '3.4'
+          - redmine: '7.0.2'
+            ruby: '3.2'
+          - redmine: '7.0.2'
             ruby: '3.3'
-          - redmine: 6.1.3
-            ruby: '3.3'
+          - redmine: '7.0.2'
+            ruby: '3.4'
+          - redmine: '7.0.2'
+            ruby: '4.0'
 
     name: Redmine ${{ matrix.redmine }} / Ruby ${{ matrix.ruby }}
 
@@ -37,7 +50,7 @@ jobs:
       - name: Check out plugin
         uses: actions/checkout@v4
         with:
-          path: redmine/plugins/redmine_status_history
+          path: redmine/plugins/redmine_status_flow
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -47,7 +60,7 @@ jobs:
       - name: Configure Redmine
         working-directory: redmine
         run: |
-          cp plugins/redmine_status_history/.github/database.yml config/database.yml
+          cp plugins/redmine_status_flow/.github/database.yml config/database.yml
           bundle config set path vendor/bundle
           bundle install --jobs 4 --retry 3
 
@@ -61,17 +74,44 @@ jobs:
           bundle exec rake redmine:plugins:migrate
           bundle exec rake redmine:load_default_data
 
+      # A plugin migration must be reversible. VERSION=0 uninstalls, and the
+      # assertion proves nothing was left behind, which is the failure mode of
+      # a rename: the old id's rows stay in schema_migrations and Redmine
+      # replays migrations that already ran.
       - name: Verify migration cycle
         working-directory: redmine
         env:
           RAILS_ENV: test
         run: |
-          bundle exec rake redmine:plugins:migrate NAME=redmine_status_history VERSION=0
+          bundle exec rake redmine:plugins:migrate NAME=redmine_status_flow VERSION=0
           bundle exec rails runner 'raise "Plugin table still exists" if ActiveRecord::Base.connection.table_exists?(:issue_status_histories); raise "Plugin column still exists" if ActiveRecord::Base.connection.column_exists?(:issues, :last_status_update)'
-          bundle exec rake redmine:plugins:migrate NAME=redmine_status_history
+          bundle exec rake redmine:plugins:migrate NAME=redmine_status_flow
+
+      # The backfill is a rake task, not a migration, so nothing runs it for
+      # free. Running it here keeps the task loadable and its verify step
+      # honest on every supported Redmine.
+      - name: Rebuild and verify the history
+        working-directory: redmine
+        env:
+          RAILS_ENV: test
+        run: |
+          bundle exec rake redmine_status_flow:rebuild BATCH_SIZE=100
+          bundle exec rake redmine_status_flow:verify
+
+      # The stylesheet is a plugin asset. On Redmine 5.x it is copied into
+      # public/plugin_assets at boot; on 6.0+ it only exists once the pipeline
+      # has processed it. Either way a broken registration shows up here as an
+      # empty result instead of as an unstyled page in production.
+      - name: Precompile the plugin assets
+        working-directory: redmine
+        env:
+          RAILS_ENV: test
+        run: |
+          bundle exec rake assets:precompile
+          find public/assets public/plugin_assets -path '*redmine_status_flow*' -name '*.css' | grep -q .
 
       - name: Run plugin tests
         working-directory: redmine
         env:
           RAILS_ENV: test
-        run: bundle exec rake redmine:plugins:test NAME=redmine_status_history
+        run: bundle exec rake redmine:plugins:test NAME=redmine_status_flow

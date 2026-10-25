@@ -12,3 +12,21 @@ es:
   label_history_issue_creation: Creación de la petición
   label_history_current_status: Estado actual
   field_last_status_update: Último cambio de estado
+
+  label_status_flow_timeline: Cronología de estados
+  label_status_flow_change_count:
+    zero: sin cambios de estado
+    one: 1 cambio de estado
+    other: "%{count} cambios de estado"
+  label_status_flow_for_duration: "desde hace %{duration}"
+  label_status_flow_created: Creada
+  label_status_flow_changed: Cambiada
+  label_status_flow_under_minute: "< 1 min"
+  label_status_flow_changed_to: Estado cambiado a
+  label_status_flow_changed_from: Estado cambiado desde
+  label_status_flow_changed_between: Estado cambiado el
+  label_status_flow_time_in_current_status: Días en el estado actual
+  label_status_flow_reopen_count: Número de reaperturas
+  label_status_flow_duration_days: "%{days}d %{hours}h"
+  label_status_flow_duration_hours: "%{hours}h %{minutes}min"
+  label_status_flow_duration_minutes: "%{minutes}min"

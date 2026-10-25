@@ -1,0 +1,33 @@
+# French translations for redmine_status_flow (Redmine Status Flow).
+fr:
+  permission_search_status_history: Rechercher l'historique des statuts
+  error_status_history_invalid_date: Saisissez une plage de dates valide
+
+  label_history_main_search: Rechercher les changements de statut
+
+  label_history_status_from: Statut d'origine
+  label_history_status_to: Statut de destination
+  label_history_date_from: Du
+  label_history_date_to: Au
+  label_history_view_history: Voir l'historique
+  label_history_issue_creation: Création
+  label_history_current_status: Statut actuel
+  field_last_status_update: Dernier changement de statut
+
+  label_status_flow_timeline: Chronologie des statuts
+  label_status_flow_change_count:
+    zero: aucun changement de statut
+    one: 1 changement de statut
+    other: "%{count} changements de statut"
+  label_status_flow_for_duration: "depuis %{duration}"
+  label_status_flow_created: Créé
+  label_status_flow_changed: Changé
+  label_status_flow_under_minute: "< 1 min"
+  label_status_flow_changed_to: Statut changé vers
+  label_status_flow_changed_from: Statut changé depuis
+  label_status_flow_changed_between: Statut changé le
+  label_status_flow_time_in_current_status: Jours dans le statut actuel
+  label_status_flow_reopen_count: Nombre de réouvertures
+  label_status_flow_duration_days: "%{days}j %{hours}h"
+  label_status_flow_duration_hours: "%{hours}h %{minutes}min"
+  label_status_flow_duration_minutes: "%{minutes}min"

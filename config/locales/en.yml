@@ -12,3 +12,16 @@ en:
   label_history_issue_creation: Creation
   label_history_current_status: Current status
   field_last_status_update: Last status change
+
+  label_status_flow_timeline: Status timeline
+  label_status_flow_change_count:
+    zero: no status change
+    one: 1 status change
+    other: "%{count} status changes"
+  label_status_flow_for_duration: "for %{duration}"
+  label_status_flow_created: Created
+  label_status_flow_changed: Changed
+  label_status_flow_under_minute: "< 1min"
+  label_status_flow_duration_days: "%{days}d %{hours}h"
+  label_status_flow_duration_hours: "%{hours}h %{minutes}min"
+  label_status_flow_duration_minutes: "%{minutes}min"

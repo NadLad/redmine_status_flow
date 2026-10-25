@@ -20,6 +20,8 @@ require 'redmine_status_history/patches/journal_detail_patch'
 end
 
 require 'redmine_status_history/hooks/view_issues_index_bottom'
+require 'redmine_status_history/hooks/view_issues_show_details_bottom'
+require 'redmine_status_history/hooks/view_layouts_base_html_head'
 
 Redmine::Plugin.register :redmine_status_flow do
   name 'Redmine Status Flow'
@@ -34,7 +36,7 @@ Redmine::Plugin.register :redmine_status_flow do
 
   project_module :issue_tracking do
     permission :search_status_history,
-               { status_histories: %i[search show_history] },
+               { status_histories: %i[search] },
                require: :member
   end
 end

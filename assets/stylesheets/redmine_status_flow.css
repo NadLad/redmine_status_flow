@@ -1,0 +1,105 @@
+/* Redmine Status Flow — inline issue timeline.
+   Rendered inside the issue's .attributes block through
+   view_issues_show_details_bottom, so the styling stays quiet: it reads as
+   one more attribute of the issue, not as a widget bolted onto the page. */
+
+div.status-flow {
+  margin-top: 0.75em;
+  border-top: 1px solid #e4e4e4;
+  padding-top: 0.5em;
+}
+
+div.status-flow details.status-flow-details > summary.status-flow-summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5em;
+  padding: 0.15em 0;
+  font-weight: bold;
+}
+
+div.status-flow details.status-flow-details > summary.status-flow-summary::-webkit-details-marker {
+  display: none;
+}
+
+div.status-flow details.status-flow-details > summary.status-flow-summary::before {
+  content: "\25B8";
+  color: #888;
+  font-size: 0.9em;
+}
+
+div.status-flow details[open].status-flow-details > summary.status-flow-summary::before {
+  content: "\25BE";
+}
+
+div.status-flow .status-flow-meta {
+  font-weight: normal;
+  color: #777;
+  font-size: 0.9em;
+}
+
+ol.status-flow-list {
+  list-style: none;
+  margin: 0.5em 0 0;
+  padding: 0 0 0 0.25em;
+}
+
+ol.status-flow-list li.status-flow-item {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6em;
+  margin: 0;
+  padding: 0.3em 0 0.3em 1.1em;
+  border-left: 2px solid #dcdcdc;
+  font-size: 0.95em;
+}
+
+/* Dot on the timeline rail. */
+ol.status-flow-list li.status-flow-item::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 0.75em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #bbb;
+}
+
+ol.status-flow-list li.status-flow-current {
+  border-left-color: #2e7d32;
+}
+
+ol.status-flow-list li.status-flow-current::before {
+  background: #2e7d32;
+}
+
+li.status-flow-item .status-flow-status {
+  font-weight: bold;
+  min-width: 8em;
+}
+
+li.status-flow-item .status-flow-when {
+  color: #666;
+}
+
+li.status-flow-item .status-flow-duration {
+  color: #444;
+  font-variant-numeric: tabular-nums;
+  background: #f2f2f2;
+  border-radius: 3px;
+  padding: 0 0.35em;
+}
+
+li.status-flow-item .status-flow-transition {
+  color: #999;
+  font-size: 0.9em;
+}
+
+li.status-flow-current .status-flow-status {
+  color: #2e7d32;
+}

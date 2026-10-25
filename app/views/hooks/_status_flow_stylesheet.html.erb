@@ -1,0 +1,7 @@
+<%# Redmine registers a plugin's assets/ tree under
+    <prefix>/<plugin_id>/, where every subdirectory of assets/ (stylesheets,
+    images, ...) is flattened into that one namespace -- so the logical path of
+    assets/stylesheets/redmine_status_flow.css is
+    plugin_assets/redmine_status_flow/redmine_status_flow.css. Redmine does not
+    include plugin stylesheets on its own, hence this explicit link. %>
+<%= stylesheet_link_tag 'plugin_assets/redmine_status_flow/redmine_status_flow', media: 'all' %>

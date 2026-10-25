@@ -2,10 +2,6 @@ class StatusHistoriesController < ApplicationController
   before_action :find_project_by_project_id
   before_action :authorize
 
-  def show_history
-    @issue = @project.issues.visible(User.current).find(params[:issue_id])
-  end
-
   def search
     @statuses = @project.trackers.flat_map(&:issue_statuses).uniq.sort_by(&:name)
     @status_to = params[:status_to]

@@ -1,7 +1,24 @@
-<%# Redmine registers a plugin's assets/ tree under
-    <prefix>/<plugin_id>/, where every subdirectory of assets/ (stylesheets,
-    images, ...) is flattened into that one namespace -- so the logical path of
-    assets/stylesheets/redmine_status_flow.css is
-    plugin_assets/redmine_status_flow/redmine_status_flow.css. Redmine does not
-    include plugin stylesheets on its own, hence this explicit link. %>
-<%= stylesheet_link_tag 'plugin_assets/redmine_status_flow/redmine_status_flow', media: 'all' %>
+<%# Redmine does not include a plugin's stylesheets on its own, so this partial
+    emits the one link the plugin needs. The URL is not the same on every
+    supported Redmine, and getting it wrong is a silent 404 (unstyled page,
+    green CI):
+
+    - Redmine 5.x copies assets/ into public/plugin_assets/<plugin_id>/ at boot,
+      keeping the subdirectories. The file is then plain static content, so a
+      static href is enough -- and safer than asking Sprockets to resolve a
+      logical path that only exists because it was mirrored.
+    - Redmine 6.0 replaced the copy with the asset pipeline (Propshaft since
+      7.0): assets/ subdirectories are flattened under one prefix, the URL
+      carries a content digest, and the file is only materialised by
+      `assets:precompile` (which Redmine runs on boot when
+      config.assets.redmine_detect_update is on, i.e. in production).
+      stylesheet_link_tag is the only way to get that digested URL right.
+
+    Redmine::Plugin#asset_prefix only exists from 6.0 on, which is exactly the
+    boundary, so the version decides. %>
+<% if Redmine::VERSION::MAJOR >= 6 %>
+  <%= stylesheet_link_tag 'plugin_assets/redmine_status_flow/redmine_status_flow', media: 'all' %>
+<% else %>
+  <%= tag.link rel: 'stylesheet', media: 'all',
+               href: "#{Redmine::Utils.relative_url_root}/plugin_assets/redmine_status_flow/stylesheets/redmine_status_flow.css" %>
+<% end %>

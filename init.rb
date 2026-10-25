@@ -7,14 +7,16 @@ require 'redmine_status_history/patches/issue_patch'
 require 'redmine_status_history/patches/issue_query_patch'
 require 'redmine_status_history/patches/journal_detail_patch'
 
-unless Issue.include?(RedmineStatusHistory::Patches::IssuePatch)
-  Issue.include(RedmineStatusHistory::Patches::IssuePatch)
-end
-unless IssueQuery.include?(RedmineStatusHistory::Patches::IssueQueryPatch)
-  IssueQuery.include?(RedmineStatusHistory::Patches::IssueQueryPatch)
-end
-unless JournalDetail.include?(RedmineStatusHistory::Patches::JournalDetailPatch)
-  JournalDetail.include?(RedmineStatusHistory::Patches::JournalDetailPatch)
+# Each patch module exposes InstanceMethods, and its `included` hook puts that
+# module in the class ancestors (included for Issue/JournalDetail, prepended for
+# IssueQuery). Checking the hook target rather than the wrapper is what makes
+# this idempotent: including the wrapper twice would re-register the callbacks.
+{
+  Issue => RedmineStatusHistory::Patches::IssuePatch,
+  IssueQuery => RedmineStatusHistory::Patches::IssueQueryPatch,
+  JournalDetail => RedmineStatusHistory::Patches::JournalDetailPatch
+}.each do |target, patch|
+  target.include(patch) unless target.ancestors.include?(patch.const_get(:InstanceMethods))
 end
 
 require 'redmine_status_history/hooks/view_issues_index_bottom'

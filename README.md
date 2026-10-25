@@ -21,6 +21,7 @@ It is a fork of
 - Filter and sort issue queries by the last status-change date.
 - Native query filters: `Status changed to`, `Status changed from`,
   `Status changed on`, `Days in current status` and `Reopen count`.
+- Paginated, eager-loaded search results.
 - Restrict access with a project permission.
 
 ## Query filters

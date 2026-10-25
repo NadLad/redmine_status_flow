@@ -13,6 +13,11 @@ class IssueStatusHistory < (defined?(ApplicationRecord) ? ApplicationRecord : Ac
   # fifty-change history does not push the issue description off the screen.
   TIMELINE_AUTO_OPEN = 8
 
+  # Associations the search results actually render. Preloading them keeps the
+  # query count flat: without it, every row fires its own tracker/status/
+  # assigned_to/project query from the view.
+  SEARCH_PRELOAD = %i[project tracker status priority assigned_to author].freeze
+
   def self.search_changes(project, status_id, date_from, previous_status_id = nil, date_to = nil,
                           user = User.current)
     start_at = date_from.in_time_zone.beginning_of_day
@@ -31,6 +36,7 @@ class IssueStatusHistory < (defined?(ApplicationRecord) ? ApplicationRecord : Ac
       .joins(:issue_status_histories)
       .where({ issue_status_histories: conditions })
       .distinct
+      .preload(*SEARCH_PRELOAD)
   end
 
   def update_last_status_update

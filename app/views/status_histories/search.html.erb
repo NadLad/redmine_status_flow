@@ -1,6 +1,7 @@
 <h2><%= l(:label_history_main_search) %></h2>
 
-<%= form_tag(search_status_history_path(@project), method: :post) do %>
+<%= form_tag(search_status_history_path(@project), method: :get) do %>
+  <%= hidden_field_tag :search, 1 %>
   <table id="filters-table">
     <tbody>
       <tr class="filter">
@@ -46,5 +47,8 @@
 <% end %>
 
 <hr />
+<% if @issue_pages %>
+  <span class="pagination"><%= pagination_links_full @issue_pages, @issue_count %></span>
+<% end %>
 <%= render partial: 'list_simple', locals: { issues: @issues } %>
 <% include_calendar_headers_tags %>

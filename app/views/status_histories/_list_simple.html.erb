@@ -18,8 +18,7 @@
           <td><%= issue.status %></td>
           <td>
             <%= link_to l(:label_history_view_history),
-                        show_status_history_path(@project, issue),
-                        remote: true %>
+                        issue_path(issue, anchor: 'issue-status-flow') %>
           </td>
         </tr>
       <% end %>

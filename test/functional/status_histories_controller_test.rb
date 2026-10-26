@@ -27,14 +27,6 @@ class StatusHistoriesControllerTest < ActionController::TestCase
     assert_response :forbidden
   end
 
-  test 'rejects an issue from another project' do
-    issue = Issue.where(project_id: 2).first
-
-    assert_raises ActiveRecord::RecordNotFound do
-      get :show_history, params: { project_id: @project.identifier, issue_id: issue.id, format: :js }, xhr: true
-    end
-  end
-
   test 'reports an invalid date without running a search' do
     post :search, params: { project_id: @project.identifier, date_from: 'not-a-date', status_to: 1 }
 

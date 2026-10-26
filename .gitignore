@@ -5,3 +5,8 @@
 *.log
 *.swp
 .DS_Store
+tmp/
+
+# Working notes: porting report, progress log and upstream analysis. Kept next
+# to the code for the duration of the work, deliberately not published.
+/docs/

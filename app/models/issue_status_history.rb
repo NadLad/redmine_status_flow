@@ -9,6 +9,15 @@ class IssueStatusHistory < (defined?(ApplicationRecord) ? ApplicationRecord : Ac
 
   scope :chronological, -> { order(:from, :id) }
 
+  # Above this many intervals the inline timeline starts collapsed, so a
+  # fifty-change history does not push the issue description off the screen.
+  TIMELINE_AUTO_OPEN = 8
+
+  # Associations the search results actually render. Preloading them keeps the
+  # query count flat: without it, every row fires its own tracker/status/
+  # assigned_to/project query from the view.
+  SEARCH_PRELOAD = %i[project tracker status priority assigned_to author].freeze
+
   def self.search_changes(project, status_id, date_from, previous_status_id = nil, date_to = nil,
                           user = User.current)
     start_at = date_from.in_time_zone.beginning_of_day
@@ -27,6 +36,7 @@ class IssueStatusHistory < (defined?(ApplicationRecord) ? ApplicationRecord : Ac
       .joins(:issue_status_histories)
       .where({ issue_status_histories: conditions })
       .distinct
+      .preload(*SEARCH_PRELOAD)
   end
 
   def update_last_status_update
@@ -42,5 +52,34 @@ class IssueStatusHistory < (defined?(ApplicationRecord) ? ApplicationRecord : Ac
 
   def lifetime_in_minutes
     lifetime / 60.0
+  end
+
+  # The interval that is still running: the issue's current status.
+  def open?
+    to.nil?
+  end
+
+  # Compact, locale-aware duration: "3d 4h", "4h 12min", "12min", "< 1min".
+  #
+  # This lives on the model rather than in a view helper because Redmine runs
+  # with `include_all_helpers = false` and a plugin is not an engine, so a
+  # plugin's app/helpers module is never mixed into another controller's views
+  # -- which is exactly where a view hook renders. Keeping it here means the
+  # partial needs no plugin helper to work.
+  def duration_label
+    seconds = lifetime.to_i
+    return I18n.t(:label_status_flow_under_minute) if seconds < 60
+
+    days, rest = seconds.divmod(86_400)
+    hours, rest = rest.divmod(3_600)
+    minutes = rest / 60
+
+    if days.positive?
+      I18n.t(:label_status_flow_duration_days, days: days, hours: hours)
+    elsif hours.positive?
+      I18n.t(:label_status_flow_duration_hours, hours: hours, minutes: minutes)
+    else
+      I18n.t(:label_status_flow_duration_minutes, minutes: minutes)
+    end
   end
 end

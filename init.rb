@@ -7,30 +7,49 @@ require 'redmine_status_history/patches/issue_patch'
 require 'redmine_status_history/patches/issue_query_patch'
 require 'redmine_status_history/patches/journal_detail_patch'
 
-unless Issue.include?(RedmineStatusHistory::Patches::IssuePatch)
-  Issue.include(RedmineStatusHistory::Patches::IssuePatch)
+# Each patch module exposes InstanceMethods, and its `included` hook puts that
+# module in the class ancestors (included for Issue/JournalDetail, prepended for
+# IssueQuery). Checking the hook target rather than the wrapper is what makes
+# this idempotent: including the wrapper twice would re-register the callbacks.
+{
+  Issue => RedmineStatusHistory::Patches::IssuePatch,
+  IssueQuery => RedmineStatusHistory::Patches::IssueQueryPatch,
+  JournalDetail => RedmineStatusHistory::Patches::JournalDetailPatch
+}.each do |target, patch|
+  target.include(patch) unless target.ancestors.include?(patch.const_get(:InstanceMethods))
 end
-unless IssueQuery.include?(RedmineStatusHistory::Patches::IssueQueryPatch)
-  IssueQuery.include(RedmineStatusHistory::Patches::IssueQueryPatch)
-end
-unless JournalDetail.include?(RedmineStatusHistory::Patches::JournalDetailPatch)
-  JournalDetail.include(RedmineStatusHistory::Patches::JournalDetailPatch)
+
+# Columns are registered on the class, not on an instance: IssueQuery#available_columns
+# memoizes a dup of the class array, so mutating an instance's array only lasted
+# for that one query. class_attribute shares the array with Query, hence the dup
+# before appending -- otherwise the column would leak into every query class.
+unless IssueQuery.available_columns.any? { |column| column.name == :last_status_update }
+  IssueQuery.available_columns = IssueQuery.available_columns.dup
+  IssueQuery.add_available_column(
+    QueryColumn.new(:last_status_update,
+                    sortable: "#{Issue.table_name}.last_status_update",
+                    caption: :field_last_status_update)
+  )
 end
 
 require 'redmine_status_history/hooks/view_issues_index_bottom'
+require 'redmine_status_history/hooks/view_issues_show_details_bottom'
+require 'redmine_status_history/hooks/view_layouts_base_html_head'
 
-Redmine::Plugin.register :redmine_status_history do
-  name 'Redmine Status History'
-  author 'Redmine Services'
-  description 'Searches, displays and filters issue status change history'
-  version '2.0.0'
-  url 'https://github.com/redmineservices/redmine_status_history'
-  author_url 'https://github.com/redmineservices'
-  requires_redmine version_or_higher: '5.0.0'
+Redmine::Plugin.register :redmine_status_flow do
+  name 'Redmine Status Flow'
+  author 'Nader Lad (fork of Redmine Services)'
+  description 'Status timeline, duration metrics and native status filters for issues'
+  version '3.0.0'
+  url 'https://github.com/NadLad/redmine_status_flow'
+  author_url 'https://github.com/NadLad'
+  # requires_redmine accepts a Range, which gives the fork a real upper bound:
+  # Redmine above 7.0 is refused at boot instead of loading unverified code.
+  requires_redmine version: '5.0'..'7.0'
 
   project_module :issue_tracking do
     permission :search_status_history,
-               { status_histories: %i[search show_history] },
+               { status_histories: %i[search] },
                require: :member
   end
 end

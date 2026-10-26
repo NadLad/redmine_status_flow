@@ -11,3 +11,21 @@ zh:
   label_history_issue_creation: 问题创建
   label_history_current_status: 当前状态
   field_last_status_update: 最后状态变更
+
+  label_status_flow_timeline: 状态时间线
+  label_status_flow_change_count:
+    zero: 无状态变更
+    one: 1 次状态变更
+    other: "%{count} 次状态变更"
+  label_status_flow_for_duration: "已持续 %{duration}"
+  label_status_flow_created: 创建
+  label_status_flow_changed: 变更
+  label_status_flow_under_minute: "< 1分钟"
+  label_status_flow_changed_to: 状态变更为
+  label_status_flow_changed_from: 状态变更自
+  label_status_flow_changed_between: 状态变更日期
+  label_status_flow_time_in_current_status: 当前状态持续天数
+  label_status_flow_reopen_count: 重新打开次数
+  label_status_flow_duration_days: "%{days}天 %{hours}小时"
+  label_status_flow_duration_hours: "%{hours}小时 %{minutes}分"
+  label_status_flow_duration_minutes: "%{minutes}分"

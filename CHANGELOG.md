@@ -2,6 +2,13 @@
 
 This project follows Semantic Versioning and Conventional Commits.
 
+## [Unreleased]
+
+### Added
+
+- Docker test harness (`bin/test.sh`, `docker/`) that runs the suite against
+  Redmine 7.0.2 without installing anything on the host.
+
 ## [2.0.0] - 2026-08-05
 
 ### Added

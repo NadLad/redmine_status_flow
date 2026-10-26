@@ -1,0 +1,40 @@
+<%# Inline timeline rendered through view_issues_show_details_bottom, inside
+    the issue's attributes block. No XHR, no modal: the history is part of the
+    page the user already asked for. %>
+<% intervals = issue.issue_status_histories.includes(:status, :user).chronological.to_a %>
+<% if intervals.any? %>
+  <% current = intervals.reverse.find(&:open?) %>
+  <div class="status-flow" id="issue-status-flow">
+    <details class="status-flow-details"<%= ' open' if intervals.size <= IssueStatusHistory::TIMELINE_AUTO_OPEN %>>
+      <summary class="status-flow-summary">
+        <span class="status-flow-title"><%= l(:label_status_flow_timeline) %></span>
+        <span class="status-flow-meta">
+          <%= l(:label_status_flow_change_count, count: [intervals.size - 1, 0].max) %>
+          <% if current %>
+            &middot; <%= current.status %>
+            <%= l(:label_status_flow_for_duration, duration: current.duration_label) %>
+          <% end %>
+        </span>
+      </summary>
+
+      <ol class="status-flow-list">
+        <% intervals.each_with_index do |interval, index| %>
+          <li class="status-flow-item<%= ' status-flow-current' if interval.open? %><%= ' status-flow-first' if index.zero? %>">
+            <span class="status-flow-status"><%= interval.status %></span>
+            <span class="status-flow-when">
+              <%= index.zero? ? l(:label_status_flow_created) : l(:label_status_flow_changed) %>
+              <%= format_time(interval.from) %>
+            </span>
+            <span class="status-flow-duration"><%= interval.duration_label %></span>
+            <% if interval.user %>
+              <span class="status-flow-author"><%= link_to_user(interval.user) %></span>
+            <% end %>
+            <% if interval.previous_status %>
+              <span class="status-flow-transition"><%= interval.previous_status %> &rarr; <%= interval.status %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ol>
+    </details>
+  </div>
+<% end %>

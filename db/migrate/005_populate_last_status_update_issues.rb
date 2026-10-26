@@ -1,14 +1,9 @@
 class PopulateLastStatusUpdateIssues < ActiveRecord::Migration[6.1]
+  # Same reasoning as 002: the per-issue loop (one UPDATE per issue over the
+  # whole table) belongs in `rake redmine_status_flow:rebuild`, not inside the
+  # migration transaction. Existing installations already ran this version.
   def up
-    history_class = Class.new(ActiveRecord::Base) do
-      self.table_name = 'issue_status_histories'
-    end
-
-    Issue.reset_column_information
-    Issue.find_each do |issue|
-      last_change = history_class.where(issue_id: issue.id).order(:from, :id).last
-      issue.update_column(:last_status_update, last_change&.from || issue.updated_on)
-    end
+    # no-op by design
   end
 
   def down

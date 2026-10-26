@@ -1,0 +1,40 @@
+# Test image for the redmine_status_flow plugin.
+#
+# Derived from the official Redmine 7.0.2 image, matching the core checkout kept
+# at ~/projects/redmine-7 (tag "Tagged version 7.0.2"). Deriving from the image
+# rather than from a local checkout keeps the host tree untouched: the core has
+# its own vendor/bundle and a container writing to it would leave root-owned
+# files behind.
+#
+# The upstream image bundles without the development and test groups and ships
+# neither sqlite3 nor the gems Redmine's test_helper requires (mocha,
+# net-ldap). They are declared in Gemfile.local, outside every group, so the
+# image's `bundle config without development test` does not drop them.
+#
+# Everything is baked once at build time: the core test schema lives in the
+# image, so a test run only has to migrate the plugin itself.
+FROM redmine:7.0.2
+
+USER root
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential libsqlite3-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Isolated sqlite3 database for the test environment.
+RUN printf 'test:\n  adapter: sqlite3\n  database: db/redmine_test.sqlite3\n' \
+      > /usr/src/redmine/config/database.yml
+
+# Declared outside the :test group so they are installed even though the image
+# keeps `bundle config without development test`.
+RUN printf "gem 'mocha', '>= 2.0.1'\ngem 'net-ldap', '~> 0.20.0'\n" \
+      > /usr/src/redmine/Gemfile.local
+
+RUN cd /usr/src/redmine && bundle install
+
+# Bake the core test schema and the secret token once.
+RUN cd /usr/src/redmine \
+ && RAILS_ENV=test bundle exec rake generate_secret_token \
+ && RAILS_ENV=test bundle exec rake db:create db:migrate
+
+USER redmine

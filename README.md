@@ -119,8 +119,24 @@ Remove the plugin directory and restart Redmine.
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Please report security issues according
-to [SECURITY.md](SECURITY.md).
+Nothing runs on the host. `bin/test.sh` drives a Docker image built from
+`docker/Dockerfile.test` — the official `redmine:7.0.2` image plus sqlite3, the
+gems Redmine's `test_helper` needs and the core test schema — and mounts the
+plugin inside it:
+
+```sh
+bin/test.sh build   # rebuild the image after changing Dockerfile.test
+bin/test.sh test    # migrate the plugin and run the suite (default)
+bin/test.sh boot    # boot Redmine in the test environment, list loaded plugins
+bin/test.sh shell   # shell in the image with the plugin mounted
+```
+
+The suite runs on the image alone, so a local Redmine checkout is never written
+to and no gem lands in it. CI runs the same suite against Redmine 5.1, 6.1 and
+7.0 — see `.github/workflows/test.yml`.
+
+Porting notes live in [`docs/`](docs/). See [CONTRIBUTING.md](CONTRIBUTING.md);
+please report security issues according to [SECURITY.md](SECURITY.md).
 
 ## License
 

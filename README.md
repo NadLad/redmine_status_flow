@@ -252,9 +252,8 @@ then `verify`, and materialises the plugin assets — precompiled on 6.0+, mirro
 on 5.1, which has no asset pipeline — so a broken stylesheet registration fails
 here instead of showing up as an unstyled page.
 
-Porting notes, measured evidence and the remaining backlog live in
-[`docs/`](docs/). See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit
-changes, and [SECURITY.md](SECURITY.md) before reporting a vulnerability.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit changes, and
+[SECURITY.md](SECURITY.md) before reporting a vulnerability.
 
 ## Troubleshooting
 

@@ -173,8 +173,17 @@ module RedmineStatusHistory
           Issue.connection.quote_column_name('to')
         end
 
+        # `default_timezone` moved between Rails releases: 6.1 exposes it on
+        # ActiveRecord::Base, 7.0+ on the ActiveRecord module and no longer on
+        # Base (8.1 raises NoMethodError for the class form). Reading whichever
+        # exists keeps the filter working across the whole supported range.
         def status_flow_utc(time)
-          ActiveRecord.default_timezone == :utc ? time.utc : time
+          zone = if ActiveRecord.respond_to?(:default_timezone)
+                   ActiveRecord.default_timezone
+                 else
+                   ActiveRecord::Base.default_timezone
+                 end
+          zone == :utc ? time.utc : time
         end
 
         # Mirrors Query#date_clause: a Date is expanded to the user's time zone

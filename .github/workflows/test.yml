@@ -98,17 +98,23 @@ jobs:
           bundle exec rake redmine_status_flow:rebuild BATCH_SIZE=100
           bundle exec rake redmine_status_flow:verify
 
-      # The stylesheet is a plugin asset. On Redmine 5.x it is copied into
-      # public/plugin_assets at boot; on 6.0+ it only exists once the pipeline
-      # has processed it. Either way a broken registration shows up here as an
-      # empty result instead of as an unstyled page in production.
-      - name: Precompile the plugin assets
+      # The stylesheet is a plugin asset, and the matrix serves it two ways:
+      # Redmine 5.1 ships neither sprockets nor propshaft, so `assets:precompile`
+      # does not exist there and PluginLoader mirrors assets/ into
+      # public/plugin_assets/<plugin_id>/; 6.0+ only materialises it once the
+      # pipeline has processed it. Either way a broken registration shows up
+      # here as an empty result instead of as an unstyled page in production.
+      - name: Materialise the plugin assets
         working-directory: redmine
         env:
           RAILS_ENV: test
         run: |
-          bundle exec rake assets:precompile
-          find public/assets public/plugin_assets -path '*redmine_status_flow*' -name '*.css' | grep -q .
+          if bundle exec rake -T | grep -q 'assets:precompile'; then
+            bundle exec rake assets:precompile
+          else
+            bundle exec rake redmine:plugins:assets NAME=redmine_status_flow
+          fi
+          find public/assets public/plugin_assets -path '*redmine_status_flow*' -name '*.css' 2>/dev/null | grep -q .
 
       - name: Run plugin tests
         working-directory: redmine

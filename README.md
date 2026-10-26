@@ -248,8 +248,9 @@ RAILS_ENV=test bundle exec ruby -Itest plugins/redmine_status_flow/test/unit/loc
 CI (`.github/workflows/test.yml`) repeats the same suite on eight
 Redmine/Ruby combinations across 5.1, 6.1 and 7.0. Each job also uninstalls and
 reinstalls the plugin to prove the migrations are reversible, runs `rebuild`
-then `verify`, and precompiles the assets to catch a stylesheet registration
-that would otherwise 404 silently.
+then `verify`, and materialises the plugin assets — precompiled on 6.0+, mirrored
+on 5.1, which has no asset pipeline — so a broken stylesheet registration fails
+here instead of showing up as an unstyled page.
 
 Porting notes, measured evidence and the remaining backlog live in
 [`docs/`](docs/). See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit

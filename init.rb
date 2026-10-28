@@ -6,6 +6,7 @@ $LOAD_PATH.unshift(plugin_lib) unless $LOAD_PATH.include?(plugin_lib)
 require 'redmine_status_history/patches/issue_patch'
 require 'redmine_status_history/patches/issue_query_patch'
 require 'redmine_status_history/patches/journal_detail_patch'
+require 'redmine_status_history/export'
 
 # Each patch module exposes InstanceMethods, and its `included` hook puts that
 # module in the class ancestors (included for Issue/JournalDetail, prepended for
@@ -49,7 +50,7 @@ Redmine::Plugin.register :redmine_status_flow do
 
   project_module :issue_tracking do
     permission :search_status_history,
-               { status_histories: %i[search] },
+               { status_histories: %i[search issue_export] },
                require: :member
   end
 end

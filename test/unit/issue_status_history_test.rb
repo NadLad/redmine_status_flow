@@ -67,6 +67,22 @@ class IssueStatusHistoryTest < ActiveSupport::TestCase
     assert_equal [@issue.id], issues.pluck(:id)
   end
 
+  # The export serialises intervals, not the distinct issues the search page
+  # lists, so it needs its own scope with the same filters and visibility.
+  test 'search_intervals returns the matching intervals scoped to visible issues' do
+    match = IssueStatusHistory.create!(issue: @issue, status_id: 2, previous_status_id: 1,
+                                       user: @user, from: Time.zone.parse('2026-08-03 12:00'))
+    other_issue = Issue.where(project_id: 2).first
+    IssueStatusHistory.create!(issue: other_issue, status_id: 2, previous_status_id: 1,
+                               user: @user, from: match.from)
+
+    intervals = IssueStatusHistory.search_intervals(Project.find(1), 2, Date.new(2026, 8, 3), 1,
+                                                    Date.new(2026, 8, 3), @user)
+
+    assert_equal [match.id], intervals.map(&:id)
+    assert_kind_of IssueStatusHistory, intervals.first
+  end
+
   test 'adds the status date filter and column once' do
     query = IssueQuery.new(project: Project.find(1), user: @user)
 

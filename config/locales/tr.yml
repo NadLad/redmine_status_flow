@@ -29,3 +29,6 @@ tr:
   label_status_flow_duration_days: "%{days}g %{hours}s"
   label_status_flow_duration_hours: "%{hours}s %{minutes}dk"
   label_status_flow_duration_minutes: "%{minutes}dk"
+  label_status_flow_export_changed_on: Değiştiği tarih
+  label_status_flow_export_ended_on: Bittiği tarih
+  label_status_flow_export_duration: Süre

@@ -51,4 +51,15 @@
   <span class="pagination"><%= pagination_links_full @issue_pages, @issue_count %></span>
 <% end %>
 <%= render partial: 'list_simple', locals: { issues: @issues } %>
+<% if @issue_pages %>
+  <p class="other-formats">
+    <%= link_to 'CSV', search_status_history_path(@project, search: 1, status_to: @status_to,
+                                                  status_from: @status_from, date_from: @date_from,
+                                                  date_to: @date_to, format: 'csv') %>
+    |
+    <%= link_to 'PDF', search_status_history_path(@project, search: 1, status_to: @status_to,
+                                                  status_from: @status_from, date_from: @date_from,
+                                                  date_to: @date_to, format: 'pdf') %>
+  </p>
+<% end %>
 <% include_calendar_headers_tags %>

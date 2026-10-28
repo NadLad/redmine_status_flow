@@ -36,5 +36,12 @@
         <% end %>
       </ol>
     </details>
+    <% if User.current.allowed_to?(:search_status_history, issue.project) %>
+      <p class="other-formats status-flow-export">
+        <%= link_to 'CSV', status_history_export_path(issue, format: 'csv') %>
+        |
+        <%= link_to 'PDF', status_history_export_path(issue, format: 'pdf') %>
+      </p>
+    <% end %>
   </div>
 <% end %>

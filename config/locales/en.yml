@@ -30,3 +30,6 @@ en:
   label_status_flow_duration_days: "%{days}d %{hours}h"
   label_status_flow_duration_hours: "%{hours}h %{minutes}min"
   label_status_flow_duration_minutes: "%{minutes}min"
+  label_status_flow_export_changed_on: Changed on
+  label_status_flow_export_ended_on: Ended on
+  label_status_flow_export_duration: Duration

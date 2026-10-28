@@ -31,3 +31,6 @@ fr:
   label_status_flow_duration_days: "%{days}j %{hours}h"
   label_status_flow_duration_hours: "%{hours}h %{minutes}min"
   label_status_flow_duration_minutes: "%{minutes}min"
+  label_status_flow_export_changed_on: Changé le
+  label_status_flow_export_ended_on: Terminé le
+  label_status_flow_export_duration: Durée

@@ -18,17 +18,13 @@ class IssueStatusHistory < (defined?(ApplicationRecord) ? ApplicationRecord : Ac
   # assigned_to/project query from the view.
   SEARCH_PRELOAD = %i[project tracker status priority assigned_to author].freeze
 
+  # Associations the CSV/PDF export renders. The interval's own columns plus
+  # the issue's tracker, so the export stays N+1-free like the search.
+  INTERVAL_PRELOAD = [{ issue: :tracker }, :status, :previous_status, :user].freeze
+
   def self.search_changes(project, status_id, date_from, previous_status_id = nil, date_to = nil,
                           user = User.current)
-    start_at = date_from.in_time_zone.beginning_of_day
-    end_at = (date_to || Time.zone.today).in_time_zone.end_of_day
-    conditions = {
-      from: start_at..end_at
-    }
-
-    conditions[:status_id] = status_id if status_id.present?
-
-    conditions[:previous_status_id] = previous_status_id if previous_status_id.present?
+    conditions = interval_conditions(status_id, date_from, previous_status_id, date_to)
 
     Issue
       .where(project_id: project.id)
@@ -37,6 +33,37 @@ class IssueStatusHistory < (defined?(ApplicationRecord) ? ApplicationRecord : Ac
       .where({ issue_status_histories: conditions })
       .distinct
       .preload(*SEARCH_PRELOAD)
+  end
+
+  # The export is the history itself (one row per interval), not the distinct
+  # issues the search page lists. Same filters and visibility as
+  # `search_changes`, but on the interval table and preloaded for rendering.
+  def self.search_intervals(project, status_id, date_from, previous_status_id = nil, date_to = nil,
+                            user = User.current)
+    conditions = interval_conditions(status_id, date_from, previous_status_id, date_to)
+    visible_issue_ids = Issue.where(project_id: project.id).visible(user).select(:id)
+
+    IssueStatusHistory
+      .where(issue_id: visible_issue_ids)
+      .where(conditions)
+      .order(:from, :id)
+      .preload(*INTERVAL_PRELOAD)
+  end
+
+  class << self
+    private
+
+    def interval_conditions(status_id, date_from, previous_status_id, date_to)
+      start_at = date_from.in_time_zone.beginning_of_day
+      end_at = (date_to || Time.zone.today).in_time_zone.end_of_day
+      conditions = { from: start_at..end_at }
+
+      conditions[:status_id] = status_id if status_id.present?
+
+      conditions[:previous_status_id] = previous_status_id if previous_status_id.present?
+
+      conditions
+    end
   end
 
   def update_last_status_update

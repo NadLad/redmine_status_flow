@@ -29,3 +29,6 @@ zh:
   label_status_flow_duration_days: "%{days}天 %{hours}小时"
   label_status_flow_duration_hours: "%{hours}小时 %{minutes}分"
   label_status_flow_duration_minutes: "%{minutes}分"
+  label_status_flow_export_changed_on: 变更于
+  label_status_flow_export_ended_on: 结束于
+  label_status_flow_export_duration: 持续时间

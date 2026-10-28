@@ -4,7 +4,7 @@ This project follows Semantic Versioning and Conventional Commits.
 
 ## [Unreleased]
 
-## [3.0.0] - 2026-10-27
+## [3.0.0] - 2026-10-28
 
 First release of the fork: upstream `redmine_status_history` 2.0.0 ported to
 Redmine 7.0.x and hardened for installations large enough for the old

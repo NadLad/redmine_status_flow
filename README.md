@@ -37,7 +37,7 @@ of patching around them.
 | Duplicate rows | `exists?` check, which is a race | unique index on `journal_id` |
 | Query filters | last status change only | five status-flow filters plus a sortable column |
 | Locales | en, es, tr, zh, with gaps | plus `fr`, with a parity test |
-| Tests | 10 | 28 (278 assertions) |
+| Tests | 10 | 37 (347 assertions) |
 
 ## Features
 
@@ -49,6 +49,8 @@ of patching around them.
   preloaded.
 - **Five native query filters** for issue queries, plus the `Last status change`
   date filter and sortable column.
+- **CSV and PDF export** of the status history, per issue and per search
+  result: one row per interval with its issue context.
 - **Compact duration labels** (`< 1min`, `12min`, `4h 12min`, `3d 4h`).
 - **Project permission** (`Search issue status history`) guarding both the
   search page and its results.
@@ -176,6 +178,38 @@ Two definitions worth knowing:
 - The filters use `EXISTS`/`COUNT` subqueries rather than joins. A join would
   multiply issue rows (one per interval) and break Redmine's pagination count.
 
+### Export
+
+The history can be exported as **CSV** or **PDF**, from two places that use the
+same columns and the same scope:
+
+- **A single issue** — the CSV / PDF links under the timeline on the issue page
+  export that issue's full history.
+- **A search result** — the CSV / PDF links under the transition-search results
+  export every interval matching the current filters (status from, status to,
+  date range), not just the page being displayed.
+
+The export is the **history**, one row per interval, so a search result export
+lists the matching status changes with their issue context rather than one line
+per issue:
+
+| Column | Meaning |
+| --- | --- |
+| `#` | issue id |
+| Tracker | the issue's tracker |
+| Subject | the issue's subject |
+| Status from | previous status (`NULL` for the creation row) |
+| Status to | status during the interval |
+| Changed on | when the interval started |
+| Ended on | when it ended, blank while the status is current |
+| Duration | human duration (`< 1min`, `12min`, `4h 12min`, `3d 4h`); the current status shows its running age |
+| Author | who made the change |
+
+The duration of an interval that is still open is computed at export time, so
+two exports taken at different moments show different values for it — the same
+running age the timeline displays. The export reuses the preloaded
+`search_intervals` scope, so it stays N+1-free like the search page.
+
 ## Maintenance tasks
 
 | Task | What it does |
@@ -237,7 +271,7 @@ bin/test.sh boot    # boot Redmine in the test environment, list loaded plugins
 bin/test.sh shell   # shell in the image with the plugin mounted
 ```
 
-The current suite is **28 runs, 278 assertions, 0 failures**. To run a single
+The current suite is **37 runs, 347 assertions, 0 failures**. To run a single
 file, use `bin/test.sh shell` and, inside the image:
 
 ```sh

@@ -4,6 +4,17 @@ This project follows Semantic Versioning and Conventional Commits.
 
 ## [Unreleased]
 
+### Added
+
+- CSV and PDF export of the status history, from two entry points that share
+  one column definition: the inline timeline exports a single issue's full
+  history, and the transition search exports every interval matching the
+  current filters. One row per interval — issue, tracker, subject, previous
+  status, new status, change time, end time, duration and author — so the
+  export is the history itself, not the distinct issues the search page
+  lists. It reuses the preloaded `search_intervals` scope, so it does not
+  re-introduce the N+1 the search fixed.
+
 ## [3.0.0] - 2026-10-28
 
 First release of the fork: upstream `redmine_status_history` 2.0.0 ported to

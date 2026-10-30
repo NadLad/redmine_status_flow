@@ -41,7 +41,7 @@ Redmine::Plugin.register :redmine_status_flow do
   name 'Redmine Status Flow'
   author 'Nader Lad (fork of Redmine Services)'
   description 'Status timeline, duration metrics and native status filters for issues'
-  version '3.0.0'
+  version '3.1.0'
   url 'https://github.com/NadLad/redmine_status_flow'
   author_url 'https://github.com/NadLad'
   # requires_redmine accepts a Range, which gives the fork a real upper bound:

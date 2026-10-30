@@ -1,0 +1,12 @@
+<%# Shared navigation for the report pages. They all sit behind the same
+    :search_status_history permission, so a member who can search can also
+    read the aggregates. %>
+<p class="status-flow-report-nav">
+  <%= link_to l(:label_status_flow_report_metrics), status_history_metrics_path(@project) %>
+  |
+  <%= link_to l(:label_status_flow_report_aging), status_history_aging_path(@project) %>
+  |
+  <%= link_to l(:label_status_flow_report_transitions), status_history_transitions_path(@project) %>
+  |
+  <%= link_to l(:label_history_main_search), search_status_history_path(@project) %>
+</p>

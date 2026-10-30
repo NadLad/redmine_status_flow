@@ -34,3 +34,32 @@ fr:
   label_status_flow_export_changed_on: Changé le
   label_status_flow_export_ended_on: Terminé le
   label_status_flow_export_duration: Durée
+
+  label_status_flow_report_metrics: Métriques de durée
+  label_status_flow_report_range: Période
+  label_status_flow_report_summary: "%{intervals} intervalles sur %{statuses} statuts"
+  label_status_flow_metric_status: Statut
+  label_status_flow_metric_intervals: Intervalles
+  label_status_flow_metric_mean: Moyenne
+  label_status_flow_metric_median: Médiane
+  label_status_flow_metric_p90: P90
+  label_status_flow_metric_max: Plus long
+  label_status_flow_metric_total: Durée totale
+  label_status_flow_metric_note: "Les durées comptent les intervalles commencés sur la période ; un intervalle en cours est mesuré jusqu'à maintenant. P90 est le percentile en rang le plus proche."
+
+  label_status_flow_report_aging: Rapport de vieillissement
+  label_status_flow_aging_summary: "%{over} tickets ouverts sur %{total} dépassent leur seuil"
+  label_status_flow_aging_days: Jours dans le statut
+  label_status_flow_aging_since: Dans le statut depuis
+  label_status_flow_aging_threshold: Seuil
+  label_status_flow_aging_over_flag: dépassé
+  label_status_flow_aging_filter_over: Seulement les dépassements
+  label_status_flow_aging_filter_all: Afficher tous les tickets ouverts
+  label_status_flow_aging_note: "Un ticket dépasse son seuil dès qu'il a passé au moins le nombre de jours pleins configuré dans son statut courant. Les seuils se règlent par nom de statut dans les paramètres du plugin (par exemple : In Progress: 5) ; le seuil par défaut s'applique à tout statut sans ligne dédiée, et les statuts fermés ne sont jamais listés."
+
+  label_status_flow_report_transitions: Matrice de transitions
+  label_status_flow_transition_from: Depuis
+  label_status_flow_transition_to: Vers
+  label_status_flow_transition_total: Total
+  label_status_flow_transition_note: "Chaque cellule compte les transitions du statut en ligne vers le statut en colonne dont le nouveau statut a commencé sur la période. Le pourcentage est la part de cette ligne."
+  label_status_flow_transition_empty: Aucune transition enregistrée sur cette période.

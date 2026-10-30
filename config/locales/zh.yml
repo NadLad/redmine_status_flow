@@ -32,3 +32,32 @@ zh:
   label_status_flow_export_changed_on: 变更于
   label_status_flow_export_ended_on: 结束于
   label_status_flow_export_duration: 持续时间
+
+  label_status_flow_report_metrics: 时长指标
+  label_status_flow_report_range: 时间范围
+  label_status_flow_report_summary: "%{statuses} 个状态共 %{intervals} 个区间"
+  label_status_flow_metric_status: 状态
+  label_status_flow_metric_intervals: 区间数
+  label_status_flow_metric_mean: 平均值
+  label_status_flow_metric_median: 中位数
+  label_status_flow_metric_p90: P90
+  label_status_flow_metric_max: 最长
+  label_status_flow_metric_total: 总时长
+  label_status_flow_metric_note: "时长统计在所选范围内开始的区间；进行中的区间计算至今。P90 为最近秩百分位。"
+
+  label_status_flow_report_aging: 滞留报告
+  label_status_flow_aging_summary: "%{total} 个未关闭问题中有 %{over} 个超过阈值"
+  label_status_flow_aging_days: 停留天数
+  label_status_flow_aging_since: 进入状态时间
+  label_status_flow_aging_threshold: 阈值
+  label_status_flow_aging_over_flag: 已超期
+  label_status_flow_aging_filter_over: 仅显示超期
+  label_status_flow_aging_filter_all: 显示全部未关闭问题
+  label_status_flow_aging_note: "问题在当前状态中停留满配置的完整天数后即视为超期。阈值在插件设置中按状态名称配置（例如：In Progress: 5）；未单独配置的状态使用默认值，已关闭的状态不会列出。"
+
+  label_status_flow_report_transitions: 状态流转矩阵
+  label_status_flow_transition_from: 原状态
+  label_status_flow_transition_to: 新状态
+  label_status_flow_transition_total: 合计
+  label_status_flow_transition_note: "每个单元格统计从行状态流转到列状态的次数，且新状态在所选范围内开始。百分比为该行的占比。"
+  label_status_flow_transition_empty: 该时间范围内没有流转记录。

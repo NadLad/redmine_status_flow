@@ -33,3 +33,32 @@ es:
   label_status_flow_export_changed_on: Cambiado el
   label_status_flow_export_ended_on: Finalizado el
   label_status_flow_export_duration: Duración
+
+  label_status_flow_report_metrics: Métricas de duración
+  label_status_flow_report_range: Periodo
+  label_status_flow_report_summary: "%{intervals} intervalos en %{statuses} estados"
+  label_status_flow_metric_status: Estado
+  label_status_flow_metric_intervals: Intervalos
+  label_status_flow_metric_mean: Media
+  label_status_flow_metric_median: Mediana
+  label_status_flow_metric_p90: P90
+  label_status_flow_metric_max: Más largo
+  label_status_flow_metric_total: Tiempo total
+  label_status_flow_metric_note: "Las duraciones cuentan los intervalos iniciados en el periodo; un intervalo en curso se mide hasta ahora. P90 es el percentil de rango más cercano."
+
+  label_status_flow_report_aging: Informe de antigüedad
+  label_status_flow_aging_summary: "%{over} de %{total} peticiones abiertas superan su umbral"
+  label_status_flow_aging_days: Días en el estado
+  label_status_flow_aging_since: En el estado desde
+  label_status_flow_aging_threshold: Umbral
+  label_status_flow_aging_over_flag: superado
+  label_status_flow_aging_filter_over: Solo las que superan el umbral
+  label_status_flow_aging_filter_all: Mostrar todas las peticiones abiertas
+  label_status_flow_aging_note: "Una petición supera su umbral cuando ha pasado al menos el número configurado de días completos en su estado actual. Los umbrales se definen por nombre de estado en los ajustes del plugin (por ejemplo: In Progress: 5); el valor por defecto se aplica a todo estado sin línea propia, y los estados cerrados nunca se listan."
+
+  label_status_flow_report_transitions: Matriz de transiciones
+  label_status_flow_transition_from: Desde
+  label_status_flow_transition_to: Hacia
+  label_status_flow_transition_total: Total
+  label_status_flow_transition_note: "Cada celda cuenta las transiciones del estado de la fila al estado de la columna cuyo nuevo estado comenzó en el periodo. El porcentaje es la parte de esa fila."
+  label_status_flow_transition_empty: No hay transiciones registradas en este periodo.

@@ -103,3 +103,78 @@ li.status-flow-item .status-flow-transition {
 li.status-flow-current .status-flow-status {
   color: #2e7d32;
 }
+
+/* Report pages: duration metrics, aging, transition matrix. They share the
+   navigation, the summary line and the numeric alignment. */
+p.status-flow-report-nav {
+  margin: 0 0 1em;
+  color: #777;
+}
+
+p.status-flow-report-summary {
+  font-weight: bold;
+  margin: 0.5em 0;
+}
+
+p.status-flow-report-note {
+  color: #777;
+  font-size: 0.9em;
+  margin-top: 0.75em;
+}
+
+fieldset.status-flow-report-form,
+form.status-flow-report-form fieldset {
+  margin-bottom: 1em;
+}
+
+table.status-flow-metrics td,
+table.status-flow-aging td,
+table.status-flow-matrix td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* An issue past its threshold is the point of the aging report: mark the row,
+   not just the number, so it is visible while scanning. */
+table.status-flow-aging tr.status-flow-aging-over td {
+  background: #fdecea;
+}
+
+span.status-flow-aging-flag {
+  display: inline-block;
+  margin-left: 0.4em;
+  padding: 0 0.35em;
+  border-radius: 3px;
+  background: #c62828;
+  color: #fff;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+/* Transition matrix: heat buckets, five steps from "rare for its row" to
+   "the whole row". Cells with no transition keep the default background so
+   the eye lands on the flows that exist. */
+table.status-flow-matrix th,
+table.status-flow-matrix td {
+  text-align: center;
+}
+
+table.status-flow-matrix th.matrix-corner {
+  font-size: 0.85em;
+  color: #666;
+}
+
+table.status-flow-matrix td .share {
+  display: block;
+  color: #666;
+  font-size: 0.8em;
+}
+
+table.status-flow-matrix td .none {
+  color: #c9c9c9;
+}
+
+table.status-flow-matrix td.heat-1 { background: #f1f8f1; }
+table.status-flow-matrix td.heat-2 { background: #dcefdc; }
+table.status-flow-matrix td.heat-3 { background: #c3e4c3; }
+table.status-flow-matrix td.heat-4 { background: #a5d6a5; }
+table.status-flow-matrix td.heat-5 { background: #7fc47f; }

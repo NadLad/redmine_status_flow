@@ -1,0 +1,69 @@
+<%# Aging report: one row per issue still sitting in its current status.
+    Rows past their threshold are flagged, and the sort is a server-side
+    allow-list (see StatusHistoriesController::AGING_SORTS). %>
+<% toggle = lambda do |column|
+     if @sort == column
+       @direction == 'asc' ? 'desc' : 'asc'
+     else
+       column == 'days' ? 'desc' : 'asc'
+     end
+   end %>
+<% sort_params = { over: params[:over].presence } %>
+
+<h2><%= l(:label_status_flow_report_aging) %></h2>
+<%= render partial: 'report_nav' %>
+
+<p class="status-flow-report-summary">
+  <%= l(:label_status_flow_aging_summary, over: @over_count, total: @open_count) %>
+</p>
+
+<p class="status-flow-report-filter">
+  <% if @over_only %>
+    <%= link_to l(:label_status_flow_aging_filter_all),
+                status_history_aging_path(@project, sort: @sort, direction: @direction) %>
+  <% else %>
+    <%= link_to l(:label_status_flow_aging_filter_over),
+                status_history_aging_path(@project, sort_params.merge(over: 1, sort: @sort, direction: @direction)) %>
+  <% end %>
+</p>
+
+<% if @entries.any? %>
+  <table class="list status-flow-aging">
+    <thead>
+      <tr>
+        <th><%= link_to '#', status_history_aging_path(@project, sort_params.merge(sort: 'issue', direction: toggle.call('issue'))) %></th>
+        <th><%= l(:field_tracker) %></th>
+        <th><%= l(:field_subject) %></th>
+        <th><%= link_to l(:field_status), status_history_aging_path(@project, sort_params.merge(sort: 'status', direction: toggle.call('status'))) %></th>
+        <th><%= l(:label_status_flow_aging_since) %></th>
+        <th><%= link_to l(:label_status_flow_aging_days), status_history_aging_path(@project, sort_params.merge(sort: 'days', direction: toggle.call('days'))) %></th>
+        <th><%= l(:label_status_flow_aging_threshold) %></th>
+        <th><%= l(:field_assigned_to) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @entries.each do |entry| %>
+        <% issue = entry.issue %>
+        <tr id="issue-<%= issue.id %>" class="hascontextmenu <%= cycle('odd', 'even') %> <%= 'status-flow-aging-over' if entry.over? %>">
+          <td class="id"><%= link_to issue.id, issue_path(issue) %></td>
+          <td class="tracker"><%= issue.tracker %></td>
+          <td class="subject"><%= link_to issue.subject.truncate(60), issue_path(issue) %></td>
+          <td class="status">
+            <%= entry.status %>
+            <% if entry.over? %>
+              <span class="status-flow-aging-flag"><%= l(:label_status_flow_aging_over_flag) %></span>
+            <% end %>
+          </td>
+          <td class="since"><%= format_time(entry.interval.from) %></td>
+          <td class="days"><%= entry.days %></td>
+          <td class="threshold"><%= entry.threshold %></td>
+          <td class="assigned"><%= issue.assigned_to ? link_to_user(issue.assigned_to) : '-' %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <p class="status-flow-report-note"><%= l(:label_status_flow_aging_note) %></p>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>

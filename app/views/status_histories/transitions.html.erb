@@ -1,0 +1,67 @@
+<%# Transition matrix, rendered server-side: rows are the status the work left,
+    columns the status it entered, cells the count and the share of the row.
+    No JavaScript, so the page behaves the same on Redmine 5.1 and 7.0. %>
+<h2><%= l(:label_status_flow_report_transitions) %></h2>
+<%= render partial: 'report_nav' %>
+
+<%= form_tag(status_history_transitions_path(@project), method: :get, class: 'status-flow-report-form') do %>
+  <fieldset class="box">
+    <legend><%= l(:label_status_flow_report_range) %></legend>
+    <%= label_tag :date_from, l(:label_history_date_from) %>
+    <%= date_field_tag :date_from, @date_from, size: 10 %>
+    <%= label_tag :date_to, l(:label_history_date_to) %>
+    <%= date_field_tag :date_to, @date_to, size: 10 %>
+    <%= submit_tag l(:button_apply) %>
+  </fieldset>
+<% end %>
+
+<% if @matrix && !@matrix.empty? %>
+  <table class="list status-flow-matrix">
+    <thead>
+      <tr>
+        <th class="matrix-corner">
+          <span class="axis-from"><%= l(:label_status_flow_transition_from) %></span>
+          <span class="axis-separator">&rarr;</span>
+          <span class="axis-to"><%= l(:label_status_flow_transition_to) %></span>
+        </th>
+        <% @matrix.statuses.each do |status| %>
+          <th><%= status.name %></th>
+        <% end %>
+        <th><%= l(:label_status_flow_transition_total) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @matrix.statuses.each do |from_status| %>
+        <tr id="row-<%= from_status.id %>">
+          <th><%= from_status.name %></th>
+          <% @matrix.statuses.each do |to_status| %>
+            <% count = @matrix.cell(from_status, to_status) %>
+            <% heat = @matrix.heat(from_status, to_status) %>
+            <td class="heat-<%= heat %>">
+              <% if count.positive? %>
+                <%= count %>
+                <span class="share"><%= number_to_percentage(@matrix.share(from_status, to_status) * 100, precision: 0) %></span>
+              <% else %>
+                <span class="none">&ndash;</span>
+              <% end %>
+            </td>
+          <% end %>
+          <td class="row-total"><%= @matrix.row_total(from_status) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th><%= l(:label_status_flow_transition_total) %></th>
+        <% @matrix.statuses.each do |status| %>
+          <th><%= @matrix.column_total(status) %></th>
+        <% end %>
+        <th><%= @matrix.total %></th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p class="status-flow-report-note"><%= l(:label_status_flow_transition_note) %></p>
+<% else %>
+  <p class="nodata"><%= l(:label_status_flow_transition_empty) %></p>
+<% end %>

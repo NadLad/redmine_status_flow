@@ -1,7 +1,7 @@
 class StatusHistoriesController < ApplicationController
   include RedmineStatusHistory::Export
 
-  before_action :find_project_by_project_id, only: :search
+  before_action :find_project_by_project_id, only: %i[search metrics aging transitions]
   before_action :find_issue_project, only: :issue_export
   before_action :authorize
 
@@ -19,6 +19,65 @@ class StatusHistoriesController < ApplicationController
       format.html { search_html }
       format.csv  { search_export(:csv) }
       format.pdf  { search_export(:pdf) }
+    end
+  end
+
+  # Duration metrics per status for the project. The range defaults to the last
+  # 90 days: a mean over "all time" is dominated by years-old issues and tells
+  # nobody anything actionable.
+  def metrics
+    @date_from = params[:date_from].presence || (User.current.today - 89).iso8601
+    @date_to = params[:date_to].presence || User.current.today.iso8601
+    from = parse_date(@date_from)
+    to = parse_date(@date_to)
+    @invalid_range = from.nil? || to.nil? || to < from
+
+    if @invalid_range
+      flash.now[:error] = l(:error_status_history_invalid_date)
+      @rows = []
+    else
+      @rows = RedmineStatusHistory::Metrics.report(@project, from: from, to: to, user: User.current)
+    end
+
+    @interval_count = @rows.sum(&:count)
+    @total_seconds = @rows.sum(&:total)
+  end
+
+  # Sortable columns of the aging report. The column name never reaches SQL:
+  # ?sort= is looked up in this hash, so a crafted value cannot order by an
+  # arbitrary column.
+  AGING_SORTS = {
+    'days' => ->(entry) { entry.days },
+    'status' => ->(entry) { entry.status&.name.to_s.downcase },
+    'issue' => ->(entry) { entry.interval.issue_id }
+  }.freeze
+
+  # Issues that have been in their current status longer than their threshold.
+  def aging
+    entries = RedmineStatusHistory::Aging.report(@project, user: User.current)
+    @open_count = entries.size
+    @over_count = entries.count(&:over?)
+    @over_only = params[:over].present?
+    entries = entries.select(&:over?) if @over_only
+
+    @sort, @direction = aging_sort
+    @entries = order_entries(entries)
+  end
+
+  # Transition counts between statuses for the period.
+  def transitions
+    @date_from = params[:date_from].presence || (User.current.today - 89).iso8601
+    @date_to = params[:date_to].presence || User.current.today.iso8601
+    from = parse_date(@date_from)
+    to = parse_date(@date_to)
+    @invalid_range = from.nil? || to.nil? || to < from
+
+    if @invalid_range
+      flash.now[:error] = l(:error_status_history_invalid_date)
+      @matrix = nil
+    else
+      @matrix = RedmineStatusHistory::TransitionMatrix.report(@project, from: from, to: to,
+                                                                       user: User.current)
     end
   end
 
@@ -110,6 +169,19 @@ class StatusHistoriesController < ApplicationController
     @issue_count = scope.count
     @issue_pages = Redmine::Pagination::Paginator.new(@issue_count, per_page, params[:page])
     @issues = scope.limit(per_page).offset(@issue_pages.offset).to_a
+  end
+
+  def aging_sort
+    sort = AGING_SORTS.key?(params[:sort].to_s) ? params[:sort].to_s : 'days'
+    default_direction = sort == 'days' ? 'desc' : 'asc'
+    direction = %w[asc desc].include?(params[:direction].to_s) ? params[:direction].to_s : default_direction
+
+    [sort, direction]
+  end
+
+  def order_entries(entries)
+    sorted = entries.sort_by(&AGING_SORTS[@sort])
+    @direction == 'asc' ? sorted : sorted.reverse
   end
 
   def parse_date(value)

@@ -72,4 +72,42 @@ class LocalesTest < ActiveSupport::TestCase
       end
     end
   end
+
+  # Report labels ship in the same commit as the pages that use them, so a
+  # missing translation would surface as "translation missing" in a table cell
+  # -- the kind of thing nobody reports but everybody notices.
+  REPORT_KEYS = %i[
+    label_status_flow_report_metrics label_status_flow_report_aging
+    label_status_flow_report_transitions label_status_flow_report_range
+    label_status_flow_metric_status label_status_flow_metric_intervals
+    label_status_flow_metric_mean label_status_flow_metric_median
+    label_status_flow_metric_p90 label_status_flow_metric_max
+    label_status_flow_metric_total label_status_flow_metric_note
+    label_status_flow_aging_days label_status_flow_aging_since
+    label_status_flow_aging_threshold label_status_flow_aging_over_flag
+    label_status_flow_aging_filter_over label_status_flow_aging_filter_all
+    label_status_flow_aging_note label_status_flow_transition_from
+    label_status_flow_transition_to label_status_flow_transition_total
+    label_status_flow_transition_note label_status_flow_transition_empty
+  ].freeze
+
+  test 'every report label is translated in every locale' do
+    LOCALES.each do |code|
+      I18n.with_locale(code) do
+        REPORT_KEYS.each do |key|
+          text = I18n.t(key).to_s
+          refute_match(/translation missing/i, text, "#{code}.yml is missing #{key}")
+          refute_empty text
+        end
+
+        # The two interpolated summary lines must consume their variables.
+        [
+          I18n.t(:label_status_flow_report_summary, intervals: 3, statuses: 2),
+          I18n.t(:label_status_flow_aging_summary, over: 1, total: 4)
+        ].each do |text|
+          refute_match(/%\{/, text.to_s)
+        end
+      end
+    end
+  end
 end

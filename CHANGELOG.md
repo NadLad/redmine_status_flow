@@ -4,6 +4,25 @@ This project follows Semantic Versioning and Conventional Commits.
 
 ## [Unreleased]
 
+### Added
+
+- **Duration metrics report** (`/projects/:id/issue_status_history/metrics`):
+  interval count, mean, median, p90 and longest duration per status over a date
+  range, ordered by mean. p90 is nearest rank, so every value is a duration
+  that actually occurred; percentiles are computed in Ruby because SQLite has
+  no `percentile_cont`.
+- **Aging report** (`/projects/:id/issue_status_history/aging`): open intervals
+  with the days spent in their current status, a per-status threshold and an
+  over-threshold flag. Thresholds are configured by status name in the plugin
+  settings (`aging_default_days`, `aging_thresholds`), unparsable lines fall
+  back to the default, and closed statuses are excluded.
+- **Transition matrix** (`/projects/:id/issue_status_history/transitions`):
+  from → to counts for the period with row shares, row/column totals and five
+  heat levels. Server-rendered, no JavaScript, so it behaves the same on
+  Redmine 5.1 and 7.0.
+- The three reports share one navigation, the same project permission as the
+  search, and a 90-day default range.
+
 ## [3.1.0] - 2026-10-30
 
 ### Added

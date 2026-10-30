@@ -33,3 +33,32 @@ en:
   label_status_flow_export_changed_on: Changed on
   label_status_flow_export_ended_on: Ended on
   label_status_flow_export_duration: Duration
+
+  label_status_flow_report_metrics: Duration metrics
+  label_status_flow_report_range: Period
+  label_status_flow_report_summary: "%{intervals} intervals in %{statuses} statuses"
+  label_status_flow_metric_status: Status
+  label_status_flow_metric_intervals: Intervals
+  label_status_flow_metric_mean: Mean
+  label_status_flow_metric_median: Median
+  label_status_flow_metric_p90: P90
+  label_status_flow_metric_max: Longest
+  label_status_flow_metric_total: Total time
+  label_status_flow_metric_note: "Durations count the intervals that start in the period; an interval still running is measured up to now. P90 is the nearest-rank percentile."
+
+  label_status_flow_report_aging: Aging report
+  label_status_flow_aging_summary: "%{over} of %{total} open issues are over their threshold"
+  label_status_flow_aging_days: Days in status
+  label_status_flow_aging_since: In status since
+  label_status_flow_aging_threshold: Threshold
+  label_status_flow_aging_over_flag: over
+  label_status_flow_aging_filter_over: Only over threshold
+  label_status_flow_aging_filter_all: Show every open issue
+  label_status_flow_aging_note: "An issue is over threshold once it has spent at least the configured number of full days in its current status. Thresholds are set per status name in the plugin settings (for example: In Progress: 5); the default applies to every status without its own line, and closed statuses are never listed."
+
+  label_status_flow_report_transitions: Transition matrix
+  label_status_flow_transition_from: From
+  label_status_flow_transition_to: To
+  label_status_flow_transition_total: Total
+  label_status_flow_transition_note: "Each cell counts the transitions from the row status to the column status whose new status started in the selected period. The percentage is the share of that row."
+  label_status_flow_transition_empty: No transition recorded in this period.

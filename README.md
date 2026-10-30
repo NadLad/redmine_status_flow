@@ -51,9 +51,12 @@ of patching around them.
   date filter and sortable column.
 - **CSV and PDF export** of the status history, per issue and per search
   result: one row per interval with its issue context.
+- **Three reports**, server-side and read-only: duration metrics per status
+  (mean, median, p90, longest), an aging report with per-status thresholds,
+  and a from → to transition matrix.
 - **Compact duration labels** (`< 1min`, `12min`, `4h 12min`, `3d 4h`).
-- **Project permission** (`Search issue status history`) guarding both the
-  search page and its results.
+- **Project permission** (`Search issue status history`) guarding the search,
+  its results, the export and the three reports.
 
 ## Compatibility
 
@@ -209,6 +212,76 @@ The duration of an interval that is still open is computed at export time, so
 two exports taken at different moments show different values for it — the same
 running age the timeline displays. The export reuses the preloaded
 `search_intervals` scope, so it stays N+1-free like the search page.
+
+## Reports
+
+Three read-only pages, all behind the same project permission as the search and
+linked from each other:
+
+| Page | URL | Answers |
+| --- | --- | --- |
+| Duration metrics | `/projects/:id/issue_status_history/metrics` | where the time goes |
+| Aging report | `/projects/:id/issue_status_history/aging` | what has been stuck too long |
+| Transition matrix | `/projects/:id/issue_status_history/transitions` | how work actually moves |
+
+All three default to the **last 90 days** and accept a date range. Durations
+count the intervals that **start** inside the range; an interval still running
+is measured up to now, so its value grows between two loads.
+
+### Duration metrics
+
+Per status: interval count, mean, median, p90 and longest duration, plus the
+total time. Rows are ordered by mean, slowest first.
+
+Two definitions matter, and these are the ones implemented:
+
+- **p90 uses nearest rank** — element `ceil(0.9 × n)` of the sorted durations.
+  It is not an interpolated percentile, so every reported value is a duration
+  that actually occurred.
+- **Median** averages the two middle values when the count is even.
+
+Percentiles are computed in Ruby rather than SQL: SQLite (the database the CI
+matrix runs on) has no `percentile_cont`, and three per-adapter implementations
+would be three chances to disagree. The scope is plucked, not instantiated: no
+model, no association loading.
+
+### Aging report
+
+Every open interval on a visible issue, with the days spent in its current
+status, its threshold, and a flag once it reaches it. Excluded by design:
+closed statuses — an issue resting in "Closed" is not stuck — and closed
+intervals.
+
+Sortable by issue, status or days; `?over=1` lists only the flagged rows. The
+sort is an allow-list: `?sort=` is looked up in a hash and never reaches SQL.
+
+Thresholds are **per status, keyed by name** (status ids differ between
+installations; names are what the settings form shows):
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `aging_default_days` | `7` | threshold for every status without its own line |
+| `aging_thresholds` | *(empty)* | one `Status name: days` per line, e.g. `In Progress: 5` |
+
+Both live under **Administration → Plugins → Redmine Status Flow → Configure**.
+A line that does not parse is ignored, leaving that status on the default: a
+typo must not blank the whole report. An issue is over threshold once it has
+spent **at least** the configured number of complete days in the status.
+
+### Transition matrix
+
+A `from → to` matrix: rows are the status left, columns the status entered,
+each cell a count and its share of the row, with row and column totals. Cells
+carry five heat levels, so the heavy flows read at a glance.
+
+Only transitions whose **new** status started inside the range are counted, and
+creation rows are excluded — they have no previous status, so they are an
+origin, not a transition.
+
+The matrix is rendered **server-side**, with no JavaScript. Redmine 7 bundles
+Chart.js 4.5.1, whose core has no Sankey controller (that lives in a separate
+package), and the plugin ships no JavaScript at all so the same markup runs on
+Redmine 5.1, which has no importmap. A table with heat classes needs neither.
 
 ## Maintenance tasks
 

@@ -7,6 +7,9 @@ require 'redmine_status_history/patches/issue_patch'
 require 'redmine_status_history/patches/issue_query_patch'
 require 'redmine_status_history/patches/journal_detail_patch'
 require 'redmine_status_history/export'
+require 'redmine_status_history/metrics'
+require 'redmine_status_history/aging'
+require 'redmine_status_history/transition_matrix'
 
 # Each patch module exposes InstanceMethods, and its `included` hook puts that
 # module in the class ancestors (included for Issue/JournalDetail, prepended for
@@ -48,9 +51,17 @@ Redmine::Plugin.register :redmine_status_flow do
   # Redmine above 7.0 is refused at boot instead of loading unverified code.
   requires_redmine version: '5.0'..'7.0'
 
+  # Aging thresholds. Statuses are matched by name, not id: ids are
+  # per-installation, names are what the administrator sees in this form.
+  # A status without its own line uses aging_default_days.
+  settings default: {
+    'aging_default_days' => '7',
+    'aging_thresholds' => ''
+  }
+
   project_module :issue_tracking do
     permission :search_status_history,
-               { status_histories: %i[search issue_export] },
+               { status_histories: %i[search issue_export metrics aging transitions] },
                require: :member
   end
 end

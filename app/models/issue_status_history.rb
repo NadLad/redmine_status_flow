@@ -94,7 +94,15 @@ class IssueStatusHistory < (defined?(ApplicationRecord) ? ApplicationRecord : Ac
   # -- which is exactly where a view hook renders. Keeping it here means the
   # partial needs no plugin helper to work.
   def duration_label
-    seconds = lifetime.to_i
+    self.class.format_duration(lifetime)
+  end
+
+  # Formats a raw number of seconds with the same rules as an interval's own
+  # label. The reports aggregate durations that no longer belong to a single
+  # interval (a mean, a p90), so the formatting has to live somewhere both the
+  # model and the metrics report can call.
+  def self.format_duration(seconds)
+    seconds = seconds.to_i
     return I18n.t(:label_status_flow_under_minute) if seconds < 60
 
     days, rest = seconds.divmod(86_400)

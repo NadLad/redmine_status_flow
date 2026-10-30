@@ -1,0 +1,50 @@
+<h2><%= l(:label_status_flow_report_metrics) %></h2>
+<%= render partial: 'report_nav' %>
+
+<%= form_tag(status_history_metrics_path(@project), method: :get, class: 'status-flow-report-form') do %>
+  <fieldset class="box">
+    <legend><%= l(:label_status_flow_report_range) %></legend>
+    <%= label_tag :date_from, l(:label_history_date_from) %>
+    <%= date_field_tag :date_from, @date_from, size: 10 %>
+    <%= label_tag :date_to, l(:label_history_date_to) %>
+    <%= date_field_tag :date_to, @date_to, size: 10 %>
+    <%= submit_tag l(:button_apply) %>
+  </fieldset>
+<% end %>
+
+<% if @rows.any? %>
+  <p class="status-flow-report-summary">
+    <%= l(:label_status_flow_report_summary, intervals: @interval_count, statuses: @rows.size) %>
+  </p>
+
+  <table class="list status-flow-metrics">
+    <thead>
+      <tr>
+        <th><%= l(:label_status_flow_metric_status) %></th>
+        <th><%= l(:label_status_flow_metric_intervals) %></th>
+        <th><%= l(:label_status_flow_metric_mean) %></th>
+        <th><%= l(:label_status_flow_metric_median) %></th>
+        <th><%= l(:label_status_flow_metric_p90) %></th>
+        <th><%= l(:label_status_flow_metric_max) %></th>
+        <th><%= l(:label_status_flow_metric_total) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @rows.each do |row| %>
+        <tr id="status-<%= row.status.respond_to?(:id) ? row.status.id : 'unknown' %>">
+          <td class="status"><%= row.status_label %></td>
+          <td class="count"><%= row.count %></td>
+          <td><%= row.mean_label %></td>
+          <td><%= row.median_label %></td>
+          <td><%= row.p90_label %></td>
+          <td><%= row.max_label %></td>
+          <td><%= row.total_label %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <p class="status-flow-report-note"><%= l(:label_status_flow_metric_note) %></p>
+<% else %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>

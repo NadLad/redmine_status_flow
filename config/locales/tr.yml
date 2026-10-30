@@ -32,3 +32,32 @@ tr:
   label_status_flow_export_changed_on: Değiştiği tarih
   label_status_flow_export_ended_on: Bittiği tarih
   label_status_flow_export_duration: Süre
+
+  label_status_flow_report_metrics: Süre metrikleri
+  label_status_flow_report_range: Dönem
+  label_status_flow_report_summary: "%{statuses} durumda %{intervals} aralık"
+  label_status_flow_metric_status: Durum
+  label_status_flow_metric_intervals: Aralıklar
+  label_status_flow_metric_mean: Ortalama
+  label_status_flow_metric_median: Medyan
+  label_status_flow_metric_p90: P90
+  label_status_flow_metric_max: En uzun
+  label_status_flow_metric_total: Toplam süre
+  label_status_flow_metric_note: "Süreler dönem içinde başlayan aralıkları sayar; sürmekte olan aralık şimdiye kadar ölçülür. P90 en yakın sıra yüzdelik değeridir."
+
+  label_status_flow_report_aging: Yaşlanma raporu
+  label_status_flow_aging_summary: "%{total} açık kaydın %{over} tanesi eşiğini aşıyor"
+  label_status_flow_aging_days: Durumdaki gün sayısı
+  label_status_flow_aging_since: Durumda olduğu tarih
+  label_status_flow_aging_threshold: Eşik
+  label_status_flow_aging_over_flag: aşıldı
+  label_status_flow_aging_filter_over: Yalnızca eşiği aşanlar
+  label_status_flow_aging_filter_all: Tüm açık kayıtları göster
+  label_status_flow_aging_note: "Bir kayıt, geçerli durumunda yapılandırılan tam gün sayısını doldurduğunda eşiğini aşmış sayılır. Eşikler eklenti ayarlarında durum adına göre tanımlanır (örnek: In Progress: 5); kendi satırı olmayan her durum varsayılanı kullanır ve kapalı durumlar hiç listelenmez."
+
+  label_status_flow_report_transitions: Geçiş matrisi
+  label_status_flow_transition_from: Kaynak
+  label_status_flow_transition_to: Hedef
+  label_status_flow_transition_total: Toplam
+  label_status_flow_transition_note: "Her hücre, satırdaki durumdan sütundaki duruma geçişleri sayar; yeni durum seçilen dönemde başlamış olmalıdır. Yüzde, o satırın payıdır."
+  label_status_flow_transition_empty: Bu dönemde kaydedilmiş geçiş yok.

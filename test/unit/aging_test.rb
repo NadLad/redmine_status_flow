@@ -27,6 +27,16 @@ class AgingTest < ActiveSupport::TestCase
                                .find { |entry| entry.issue == issue }
   end
 
+  # Redmine renders the plugin settings form from these defaults: a missing
+  # key means no field, and no field means the threshold cannot be configured
+  # at all -- which no request-level test would ever catch.
+  test 'registers both threshold settings with defaults' do
+    defaults = Redmine::Plugin.find(:redmine_status_flow).settings[:default]
+
+    assert_equal '7', defaults['aging_default_days']
+    assert_equal '', defaults['aging_thresholds']
+  end
+
   test 'falls back to seven days when no default is stored' do
     assert_equal 7, RedmineStatusHistory::Aging.default_days
   end

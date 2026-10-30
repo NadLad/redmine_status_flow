@@ -4,6 +4,8 @@ This project follows Semantic Versioning and Conventional Commits.
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-10-30
+
 ### Added
 
 - CSV and PDF export of the status history, from two entry points that share
@@ -119,6 +121,7 @@ keeps its rows and only needs the two steps under **Breaking changes**.
   7.1 and later refuse to boot the plugin instead of loading code that was
   never run against them.
 
-[Unreleased]: https://github.com/NadLad/redmine_status_flow/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/NadLad/redmine_status_flow/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/NadLad/redmine_status_flow/releases/tag/v3.1.0
 [3.0.0]: https://github.com/NadLad/redmine_status_flow/releases/tag/v3.0.0
 [2.0.0]: https://github.com/redmineservices/redmine_status_history/releases/tag/v2.0.0

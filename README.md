@@ -28,7 +28,7 @@ that were never applied because of a guard bug, a write path that could return
 URL that 404s on 5.x without raising. This fork fixes those at the root instead
 of patching around them.
 
-| Concern | Upstream 2.0.0 | 3.0.0 |
+| Concern | Upstream 2.0.0 | 3.1.0 |
 | --- | --- | --- |
 | Redmine | 5.0 – 6.1 | 5.0 – 7.0, with an upper bound |
 | Timeline | modal, opened by XHR (`showModal` + `.js.erb`) | inline partial on the issue page |
